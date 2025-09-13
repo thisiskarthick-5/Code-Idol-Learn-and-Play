@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Idol - Community Edition</title>
+    <style>
+        /* --- Basic Setup & Theme --- */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --primary-color: #00ffff; /* Neon Cyan */
+            --secondary-color: #ff00ff; /* Neon Magenta */
+            --background-color: #1a1a2e;
+            --surface-color: #162447;
+            --text-color: #e0e0e0;
+            --success-color: #00ff7f;
+            --error-color: #ff4d4d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Main Game Container --- */
+        .game-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            max-height: 800px;
+            background-color: var(--surface-color);
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 20px var(--primary-color);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Onboarding Screen --- */
+        #onboarding {
+            text-align: center;
+            padding: 40px;
+        }
+        #onboarding h1 {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--primary-color);
+            font-size: 3rem;
+            text-shadow: 0 0 10px var(--primary-color);
+            margin-bottom: 20px;
+        }
+        #onboarding p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .onboarding-form input {
+            background-color: #1f2a40;
+            border: 1px solid var(--primary-color);
+            color: var(--text-color);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+        .onboarding-form button {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        .onboarding-form button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        /* --- Main Dashboard --- */
+        #dashboard {
+            display: flex;
+            gap: 20px; /* Gap between main content and sidebar */
+            height: 100%;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            flex-grow: 1;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .player-info h2 {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--primary-color);
+        }
+
+        .player-stats { display: flex; gap: 20px; }
+        .stat { background: #1f2a40; padding: 5px 10px; border-radius: 5px; }
+
+        .player-badges h3 { font-size: 1rem; margin-bottom: 5px; color: var(--secondary-color); }
+        #badges-container { display: flex; gap: 10px; min-height: 24px; }
+        .badge {
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* --- Community Sidebar --- */
+        .community-sidebar {
+            flex-basis: 250px; /* Fixed width for the sidebar */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-left: 20px;
+            border-left: 1px dashed var(--primary-color);
+        }
+        .sidebar-widget {
+            background-color: #1f2a40;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--secondary-color);
+        }
+        .sidebar-widget h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px var(--secondary-color);
+        }
+        #leaderboard-list {
+            list-style: none;
+        }
+        #leaderboard-list li {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #global-stats p {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+         #global-stats .stat-value {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+
+        /* --- Learning Path --- */
+        .learning-path {
+            flex-grow: 1;
+            overflow-y: auto;
+             padding-right: 10px; /* For scrollbar */
+        }
+        .season {
+            margin-bottom: 30px;
+        }
+        .season h3 {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 1px dashed var(--primary-color);
+            padding-bottom: 5px;
+        }
+
+        .episodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .episode-card {
+            background: #1f2a40;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        .episode-card.unlocked {
+            border-color: var(--primary-color);
+            cursor: pointer;
+        }
+        .episode-card.unlocked:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+        }
+        .episode-card.completed {
+            border-color: var(--success-color);
+            background-color: #2a3b4f;
+        }
+        .episode-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+         .episode-card.completed h4 { color: var(--success-color); }
+        .episode-card p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .status-icon {
+            float: right;
+            font-size: 1.2rem;
+        }
+
+        /* --- Challenge Modal --- */
+        #challenge-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+        }
+        #challenge-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 1000px;
+            height: 90vh;
+            max-height: 700px;
+            background-color: var(--surface-color);
+            border: 2px solid var(--secondary-color);
+            box-shadow: 0 0 20px var(--secondary-color);
+            border-radius: 15px;
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--secondary-color);
+        }
+        .modal-header h3 { color: var(--secondary-color); }
+        
+        .modal-content {
+            display: flex;
+            flex-grow: 1;
+            padding: 20px;
+            gap: 20px;
+            overflow: hidden; /* Prevent content from overflowing modal */
+        }
+
+        .story-panel { flex: 1; overflow-y: auto; }
+        .story-panel h4 { color: var(--primary-color); margin-bottom: 10px; }
+        #story-prompt { 
+            background: #1f2a40;
+            padding: 15px;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+
+        .coding-panel { flex: 2; display: flex; flex-direction: column; }
+        .coding-panel textarea {
+            flex-grow: 1;
+            background-color: #10101a;
+            color: var(--text-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            resize: none;
+        }
+        #code-preview-container {
+             margin-top: 10px;
+             display: flex;
+             flex-direction: column;
+        }
+        #code-preview-container h4 {
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+        .code-preview {
+            flex-grow: 1;
+            min-height: 100px;
+            background: white;
+            border-radius: 5px;
+            padding: 10px;
+            overflow: auto;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--secondary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-footer button {
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .share-btn {
+            background-color: var(--primary-color) !important;
+            margin-left: 10px;
+        }
+
+        #challenge-feedback {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .feedback-success { color: var(--success-color); }
+        .feedback-error { color: var(--error-color); }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- ONBOARDING SCREEN -->
+        <div id="onboarding">
+            <h1>CODE IDOL</h1>
+            <p>"You just got hired as a junior developer at StartupX. You've got skills, but do you have what it takes to become the next Code Idol? Let's find out!"</p>
+            <div class="onboarding-form">
+                <input type="text" id="nickname" placeholder="Enter Your Nickname...">
+                <button id="start-journey">Start My Career</button>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD -->
+        <div id="dashboard" class="hidden">
+            <div class="main-content">
+                <header>
+                    <div class="player-info">
+                        <h2 id="player-nickname"></h2>
+                        <div class="player-stats">
+                            <div class="stat">LVL: <span id="player-level">1</span></div>
+                            <div class="stat">XP: <span id="player-xp">0</span> / <span id="next-level-xp">100</span></div>
+                        </div>
+                    </div>
+                    <div class="player-badges">
+                        <h3>Badges</h3>
+                        <div id="badges-container"></div>
+                    </div>
+                </header>
+
+                <main class="learning-path" id="learning-path-container">
+                    <!-- Seasons and episodes will be injected here by JS -->
+                </main>
+            </div>
+            <aside class="community-sidebar">
+                <div id="leaderboard" class="sidebar-widget">
+                    <h3>Leaderboard</h3>
+                    <ol id="leaderboard-list"></ol>
+                </div>
+                <div id="global-stats" class="sidebar-widget">
+                    <h3>Community Stats</h3>
+                    <p>Challenges Completed: <span class="stat-value" id="total-completed">0</span></p>
+                    <p>Lines of Code Written: <span class="stat-value" id="total-lines">0</span></p>
+                </div>
+            </aside>
+        </div>
+    </div>
+    
+    <!-- CHALLENGE MODAL -->
+    <div id="challenge-modal-backdrop" class="hidden">
+        <div id="challenge-modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Challenge</h3>
+            </div>
+            <div class="modal-content">
+                <div class="story-panel">
+                    <h4>Task from your mentor:</h4>
+                    <div id="story-prompt"></div>
+                </div>
+                <div class="coding-panel">
+                    <textarea id="code-editor" spellcheck="false"></textarea>
+                    <div id="code-preview-container" class="hidden">
+                        <h4>Live Preview</h4>
+                        <div id="code-preview" class="code-preview"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="challenge-feedback"></div>
+                <div>
+                    <button id="run-code-btn">Submit Code</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const gameData = {
+            seasons: [
+                {
+                    id: 's1',
+                    title: 'Season 1: The Internship',
+                    badge: 'HTML Rookie',
+                    episodes: [
+                        {
+                            id: 's1e1',
+                            title: 'The First Push',
+                            description: 'Your boss asks you to set up the company homepage. Just a title and a welcome message.',
+                            prompt: "Okay rookie, welcome to the team. We need a homepage, like, yesterday. Just put up a main heading that says 'Welcome to StartupX' and a paragraph below it saying 'Our journey to become the next Code Idol starts now!'. Don't mess this up.",
+                            boilerplate: `<!DOCTYPE html>\n<html>\n<head>\n  <title>StartupX</title>\n</head>\n<body>\n\n  <!-- Your code goes here -->\n\n</body>\n</html>`,
+                            type: 'html',
+                            xp: 50,
+                            validation: (code) => {
+                                const h1 = /<h1>\s*Welcome to StartupX\s*<\/h1>/i.test(code);
+                                const p = /<p>\s*Our journey to become the next Code Idol starts now!\s*<\/p>/i.test(code);
+                                return h1 && p;
+                            }
+                        },
+                        {
+                            id: 's1e2',
+                            title: 'The Client Request',
+                            description: 'A client wants a basic contact form. Nothing fancy, just fields for name and email, and a submit button.',
+                            prompt: "A high-priority client needs a contact form. I need a form with a text input for 'name', an email input for 'email', and a 'Send' button. Label the inputs properly so they know what to fill in!",
+                            boilerplate: `<form>\n  <!-- Add a name label and input -->\n\n  <!-- Add an email label and input -->\n\n  <!-- Add a submit button -->\n</form>`,
+                            type: 'html',
+                            xp: 75,
+                            validation: (code) => {
+                                const nameInput = /<input[^>]+type=["']text["'][^>]*>/i.test(code);
+                                const emailInput = /<input[^>]+type=["']email["'][^>]*>/i.test(code);
+                                const button = /<button[^>]*>.*Send.*<\/button>/i.test(code);
+                                return nameInput && emailInput && button;
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: 's2',
+                    title: 'Season 2: Rising Star',
+                    badge: 'CSS Stylist',
+                    episodes: [
+                        {
+                            id: 's2e1',
+                            title: 'The Ugly Landing Page',
+                            description: 'The Marketing team hates the landing page. They want you to add some color and style!',
+                            prompt: "This page is so bland! The designer wants the main container box to have a blue background and white text. The box has an ID of 'promo-box'. Make it happen.",
+                            boilerplate: `/* Select the element with the id 'promo-box' */\n#promo-box {\n  \n}`,
+                            type: 'css',
+                            xp: 100,
+                            previewHtml: `<div id="promo-box" style="padding: 20px;">This is the promo box.</div>`,
+                            validation: (code, previewElement) => {
+                                const promoBox = previewElement.querySelector('#promo-box');
+                                if (!promoBox) return false;
+                                const style = window.getComputedStyle(promoBox);
+                                const hasBlueBg = style.backgroundColor === 'rgb(0, 0, 255)';
+                                const hasWhiteText = style.color === 'rgb(255, 255, 255)';
+                                return hasBlueBg && hasWhiteText;
+                            }
+                        },
+                         {
+                            id: 's2e2',
+                            title: 'The Rival\'s Challenge',
+                            description: 'Your rival intern styled a button, but it\'s boring. Make a better one with a border and rounded corners.',
+                            prompt: "That other intern thinks their button is cool. Pfft. Take this button with the class 'btn-upgrade' and give it a 2px solid pink border and make its corners nicely rounded. I'd say 8px should do it.",
+                            boilerplate: `.btn-upgrade {\n  \n}`,
+                            type: 'css',
+                            xp: 125,
+                            previewHtml: `<button class="btn-upgrade">Upgrade Now</button>`,
+                            validation: (code, previewElement) => {
+                                const button = previewElement.querySelector('.btn-upgrade');
+                                if (!button) return false;
+                                const style = window.getComputedStyle(button);
+                                const hasPinkBorder = style.border.includes('2px solid rgb(255, 192, 203)');
+                                const hasBorderRadius = style.borderRadius === '8px';
+                                return hasPinkBorder && hasBorderRadius;
+                            }
+                        }
+                    ]
+                },
+                { // NEW SEASON
+                    id: 's3',
+                    title: 'Season 3: Team Player',
+                    badge: 'Git Collaborator',
+                    episodes: [
+                         {
+                            id: 's3e1',
+                            title: 'The Senior Dev\'s Note',
+                            description: 'A senior dev left a half-finished component. Complete it based on their comments.',
+                            prompt: "Hey, it's Alex, one of the senior devs. I started this 'user-card' component but got pulled into a priority task. Can you finish it? The comments in the CSS should tell you what to do. Thanks for the help!",
+                            boilerplate: `.user-card {\n  background-color: #eee;\n  border: 1px solid #ccc;\n  /* TODO: Add 15px of padding */\n\n  /* TODO: Add a box-shadow. Let's try: 5px 5px 10px rgba(0,0,0,0.2) */\n\n}`,
+                            type: 'css',
+                            xp: 150,
+                            previewHtml: `<div class="user-card">User Profile</div>`,
+                            validation: (code, previewElement) => {
+                                const card = previewElement.querySelector('.user-card');
+                                if (!card) return false;
+                                const style = window.getComputedStyle(card);
+                                const hasPadding = style.padding === '15px';
+                                const hasShadow = style.boxShadow === 'rgba(0, 0, 0, 0.2) 5px 5px 10px';
+                                return hasPadding && hasShadow;
+                            }
+                        }
+                    ]
+                }
+            ]
+        };
+        
+        // --- Game State ---
+        let player = {
+            nickname: 'Rookie',
+            level: 1,
+            xp: 0,
+            badges: [],
+            completedEpisodes: []
+        };
+        let currentChallenge = null;
+
+        // --- DOM Elements ---
+        const onboardingScreen = document.getElementById('onboarding');
+        const dashboardScreen = document.getElementById('dashboard');
+        const nicknameInput = document.getElementById('nickname');
+        const startBtn = document.getElementById('start-journey');
+        
+        const playerNicknameEl = document.getElementById('player-nickname');
+        const playerLevelEl = document.getElementById('player-level');
+        const playerXpEl = document.getElementById('player-xp');
+        const nextLevelXpEl = document.getElementById('next-level-xp');
+        const badgesContainer = document.getElementById('badges-container');
+        const learningPathContainer = document.getElementById('learning-path-container');
+        
+        const modalBackdrop = document.getElementById('challenge-modal-backdrop');
+        const modalTitle = document.getElementById('modal-title');
+        const storyPrompt = document.getElementById('story-prompt');
+        const codeEditor = document.getElementById('code-editor');
+        const runCodeBtn = document.getElementById('run-code-btn');
+        const feedbackEl = document.getElementById('challenge-feedback');
+        const previewContainer = document.getElementById('code-preview-container');
+        const previewEl = document.getElementById('code-preview');
+
+        // Community Elements
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const totalCompletedEl = document.getElementById('total-completed');
+        const totalLinesEl = document.getElementById('total-lines');
+
+
+        // --- Game Logic ---
+        function getXpForNextLevel(level) {
+            return level * 100;
+        }
+
+        function updateUI() {
+            playerNicknameEl.textContent = player.nickname;
+            playerLevelEl.textContent = player.level;
+            playerXpEl.textContent = player.xp;
+            nextLevelXpEl.textContent = getXpForNextLevel(player.level);
+            
+            badgesContainer.innerHTML = '';
+            player.badges.forEach(badge => {
+                const badgeEl = document.createElement('div');
+                badgeEl.className = 'badge';
+                badgeEl.textContent = badge;
+                badgesContainer.appendChild(badgeEl);
+            });
+            renderLearningPath();
+            updateLeaderboard();
+            updateGlobalStats();
+        }
+
+        function addXP(amount) {
+            player.xp += amount;
+            feedbackEl.innerHTML = `<span>Success! +${amount} XP!</span>`;
+            feedbackEl.className = 'feedback-success';
+            
+            // Add Share Button
+            const shareBtn = document.createElement('button');
+            shareBtn.textContent = 'Share';
+            shareBtn.className = 'share-btn';
+            shareBtn.onclick = shareSuccess;
+            feedbackEl.appendChild(shareBtn);
+
+            const xpForNext = getXpForNextLevel(player.level);
+            if (player.xp >= xpForNext) {
+                player.level++;
+                player.xp -= xpForNext;
+                // Add level up animation/modal later
+            }
+            updateLeaderboard(player.nickname, player.xp + (player.level - 1) * 100); // Pass total accumulated XP
+            updateUI();
+        }
+
+        function awardBadge(badgeName) {
+            if (!player.badges.includes(badgeName)) {
+                player.badges.push(badgeName);
+            }
+        }
+        
+        function checkSeasonCompletion(seasonId) {
+            const season = gameData.seasons.find(s => s.id === seasonId);
+            const seasonEpisodes = season.episodes.map(e => e.id);
+            const completed = seasonEpisodes.every(epId => player.completedEpisodes.includes(epId));
+            
+            if (completed) {
+                awardBadge(season.badge);
+            }
+        }
+
+        function completeChallenge() {
+            if (!currentChallenge) return;
+            
+            player.completedEpisodes.push(currentChallenge.id);
+            const seasonId = gameData.seasons.find(s => s.episodes.some(e => e.id === currentChallenge.id)).id;
+            
+            addXP(currentChallenge.xp);
+            checkSeasonCompletion(seasonId);
+            
+            // Update Community Stats
+            const linesOfCode = codeEditor.value.split('\n').length;
+            updateGlobalStats(1, linesOfCode);
+
+
+            setTimeout(() => {
+                closeModal();
+            }, 2500); // Increased time to allow for sharing
+        }
+
+        function runCode() {
+            const userCode = codeEditor.value;
+            let isValid = false;
+            
+            if (currentChallenge.type === 'html') {
+                isValid = currentChallenge.validation(userCode);
+            } else if (currentChallenge.type === 'css') {
+                const styleTag = document.createElement('style');
+                styleTag.innerHTML = userCode;
+                // Clear previous styles and content before re-rendering
+                while (previewEl.firstChild) {
+                    previewEl.removeChild(previewEl.firstChild);
+                }
+                previewEl.appendChild(styleTag);
+                previewEl.insertAdjacentHTML('beforeend', currentChallenge.previewHtml);
+                
+                // Use a small delay to ensure styles are applied before validation
+                setTimeout(() => {
+                    isValid = currentChallenge.validation(userCode, previewEl);
+                    if (isValid) {
+                        completeChallenge();
+                    } else {
+                        feedbackEl.textContent = 'Not quite... Give it another shot!';
+                        feedbackEl.className = 'feedback-error';
+                    }
+                }, 100); // 100ms delay
+                return; // Exit function to wait for timeout
+            }
+
+            if (isValid) {
+                completeChallenge();
+            } else {
+                feedbackEl.textContent = 'Not quite... Give it another shot!';
+                feedbackEl.className = 'feedback-error';
+            }
+        }
+
+        // --- New Social/Community Functions ---
+
+        function updateLeaderboard(nickname, totalXp) {
+            let leaderboard = JSON.parse(localStorage.getItem('codeIdolLeaderboard')) || [];
+            
+            if (nickname && totalXp !== undefined) {
+                // Remove existing entry for the player
+                leaderboard = leaderboard.filter(p => p.nickname !== nickname);
+                // Add new/updated entry
+                leaderboard.push({ nickname, totalXp });
+            }
+
+            // Sort by XP descending and take top 5
+            leaderboard.sort((a, b) => b.totalXp - a.totalXp);
+            leaderboard = leaderboard.slice(0, 5);
+
+            localStorage.setItem('codeIdolLeaderboard', JSON.stringify(leaderboard));
+
+            // Render
+            leaderboardList.innerHTML = '';
+            if (leaderboard.length === 0) {
+                 leaderboardList.innerHTML = '<li>No scores yet!</li>';
+            } else {
+                leaderboard.forEach((player, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${index + 1}. ${player.nickname} - ${player.totalXp} XP`;
+                    leaderboardList.appendChild(li);
+                });
+            }
+        }
+
+        function updateGlobalStats(challengesToAdd = 0, linesToAdd = 0) {
+            let stats = JSON.parse(localStorage.getItem('codeIdolGlobalStats')) || { completed: 0, lines: 0 };
+            
+            // Add a small random amount to simulate other players
+            stats.completed += challengesToAdd + Math.floor(Math.random() * 3);
+            stats.lines += linesToAdd + Math.floor(Math.random() * 20);
+
+            localStorage.setItem('codeIdolGlobalStats', JSON.stringify(stats));
+
+            // Render
+            totalCompletedEl.textContent = stats.completed.toLocaleString();
+            totalLinesEl.textContent = stats.lines.toLocaleString();
+        }
+        
+        function shareSuccess() {
+             const shareText = `I just completed the '${currentChallenge.title}' challenge in Code Idol and earned ${currentChallenge.xp} XP! Can you beat my score? #CodeIdolGame`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Code Idol Achievement!',
+                    text: shareText,
+                }).catch(console.error);
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                prompt("Copy this to share your achievement!", shareText);
+            }
+        }
+
+        function openModal(episode) {
+            currentChallenge = episode;
+            modalTitle.textContent = episode.title;
+            storyPrompt.innerHTML = episode.prompt.replace(/\n/g, '<br>');
+            codeEditor.value = episode.boilerplate;
+            feedbackEl.textContent = '';
+            
+            if (episode.type === 'css' && episode.previewHtml) {
+                // Clear previous content before adding new
+                while (previewEl.firstChild) {
+                    previewEl.removeChild(previewEl.firstChild);
+                }
+                previewEl.insertAdjacentHTML('beforeend', episode.previewHtml);
+                previewContainer.classList.remove('hidden');
+            } else {
+                previewContainer.classList.add('hidden');
+            }
+
+            modalBackdrop.classList.remove('hidden');
+        }
+
+
+        function closeModal() {
+            currentChallenge = null;
+            modalBackdrop.classList.add('hidden');
+        }
+
+        function renderLearningPath() {
+            learningPathContainer.innerHTML = '';
+            
+            gameData.seasons.forEach((season, seasonIndex) => {
+                const seasonEl = document.createElement('div');
+                seasonEl.className = 'season';
+                seasonEl.innerHTML = `<h3>${season.title}</h3>`;
+                
+                const gridEl = document.createElement('div');
+                gridEl.className = 'episodes-grid';
+
+                season.episodes.forEach((episode, episodeIndex) => {
+                    const card = document.createElement('div');
+                    card.className = 'episode-card';
+                    
+                    const isCompleted = player.completedEpisodes.includes(episode.id);
+                    let isUnlocked = false;
+
+                    if (seasonIndex === 0 && episodeIndex === 0) {
+                        isUnlocked = true; // First episode ever is always unlocked
+                    } else if (episodeIndex > 0) {
+                        // Unlocked if previous episode in the SAME season is done
+                        const prevEpisodeId = season.episodes[episodeIndex - 1].id;
+                        isUnlocked = player.completedEpisodes.includes(prevEpisodeId);
+                    } else { // It's the first episode of a later season
+                        const prevSeason = gameData.seasons[seasonIndex - 1];
+                        const prevSeasonEpisodes = prevSeason.episodes.map(e => e.id);
+                        // Unlocked if ALL episodes of the PREVIOUS season are done
+                        isUnlocked = prevSeasonEpisodes.every(epId => player.completedEpisodes.includes(epId));
+                    }
+
+
+                    let statusIcon = '🔒';
+                    if (isCompleted) {
+                        card.classList.add('completed');
+                        statusIcon = '✅';
+                    } else if (isUnlocked) {
+                        card.classList.add('unlocked');
+                        statusIcon = '▶️';
+                        card.onclick = () => openModal(episode);
+                    } else {
+                         card.classList.add('locked');
+                    }
+                    
+                    card.innerHTML = `
+                        <span class="status-icon">${statusIcon}</span>
+                        <h4>${episode.title}</h4>
+                        <p>${episode.description}</p>
+                    `;
+                    gridEl.appendChild(card);
+                });
+                
+                seasonEl.appendChild(gridEl);
+                learningPathContainer.appendChild(seasonEl);
+            });
+        }
+
+        function startGame() {
+            const nickname = nicknameInput.value.trim();
+            if (nickname) {
+                player.nickname = nickname;
+            }
+            
+            onboardingScreen.classList.add('hidden');
+            dashboardScreen.classList.remove('hidden');
+            updateUI();
+        }
+
+        // --- Event Listeners ---
+        startBtn.addEventListener('click', startGame);
+        nicknameInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') startGame();
+        });
+        
+        runCodeBtn.addEventListener('click', runCode);
+        modalBackdrop.addEventListener('click', (e) => {
+            if (e.target === modalBackdrop) {
+                closeModal();
+            }
+        });
+
+    </script>
+
+</body>
+</html>
